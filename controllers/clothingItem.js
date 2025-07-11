@@ -1,6 +1,6 @@
 const ClothingItem = require("../models/clothingItem");
 const {
-  VALIDATION_ERROR,
+  BAD_REQUEST_ERROR,
   DEFAULT_ERROR,
   NOT_FOUND_ERROR,
 } = require("../utils/errors");
@@ -9,9 +9,9 @@ const createItem = (req, res) => {
   console.log(req);
   console.log(req.body);
 
-  const { name, weather, imageURL } = req.body;
+  const { name, weather, imageUrl } = req.body;
 
-  ClothingItem.create({ name, weather, imageURL })
+  ClothingItem.create({ name, weather, imageUrl })
     .then((item) => {
       console.log(item);
       res.status(201).send(item);
@@ -54,11 +54,12 @@ const updateItem = (req, res) => {
 };
 
 const likeItem = (req, res) => {
-  const { itemId } = req.params;
+  const { id } = req.params;
+  const { userId } = req.user._id;
 
   ClothingItem.findByIdAndUpdate(
-    itemId,
-    { $addToSet: { likes: req.user._id } },
+    id,
+    { $addToSet: { likes: userId } },
     { new: true }
   )
     .orFail()
@@ -67,19 +68,23 @@ const likeItem = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      if (err.name === "ValidationError") {
-        return res.status(VALIDATION_ERROR).send({ message: err.message });
+      if (err.name === "CastError") {
+        return res.status(BAD_REQUEST_ERROR).send({ message: err.message });
+      } else if (err.name === "DocumentNotFoundError") {
+        return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
+      } else {
+        res.status(DEFAULT_ERROR).send({ message: "Error from likeItem" });
       }
-      res.status(DEFAULT_ERROR).send({ message: "Error from likeItem", err });
     });
 };
 
 const dislikeItem = (req, res) => {
   const { itemId } = req.params;
+  const { userId } = req.user._id;
 
   ClothingItem.findByIdAndUpdate(
     itemId,
-    { $pull: { likes: req.user._id } },
+    { $pull: { likes: userId } },
     { new: true }
   )
     .orFail()
@@ -88,9 +93,15 @@ const dislikeItem = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      res
-        .status(DEFAULT_ERROR)
-        .send({ message: "Error from dislikeItem", err });
+      if (err.name === "CastError") {
+        return res.status(BAD_REQUEST_ERROR).send({ message: err.message });
+      } else if (err.name === "DocumentNotFoundError") {
+        return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
+      } else {
+        return res
+          .status(DEFAULT_ERROR)
+          .send({ message: "Error from dislikeItem", err });
+      }
     });
 };
 

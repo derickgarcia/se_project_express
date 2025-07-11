@@ -9,15 +9,6 @@ const {
   dislikeItem,
 } = require("../controllers/clothingItem");
 
-const auth = (req, res, next) => {
-  req.user = { _id: userId };
-
-  if (!req.user) {
-    return res.status(401).send({ message: "Unauthorized" });
-  }
-  next();
-};
-
 router.post("/", createItem);
 
 router.get("/", getItems);
