@@ -12,7 +12,7 @@ const createItem = (req, res) => {
 
   const { name, weather, imageUrl } = req.body;
 
-  ClothingItem.create({ name, weather, imageUrl })
+  return ClothingItem.create({ name, weather, imageUrl })
     .then((item) => {
       console.log(item);
       res.status(201).send(item);
@@ -27,7 +27,7 @@ const createItem = (req, res) => {
 };
 
 const getItems = (req, res) => {
-  ClothingItem.find({})
+  return ClothingItem.find({})
     .then((items) => {
       res.status(200).send(items);
     })
@@ -37,7 +37,7 @@ const getItems = (req, res) => {
     });
 };
 
-/*const updateItem = (req, res) => {
+/* const updateItem = (req, res) => {
   const { id } = req.params;
   const { name, weather, imageUrl } = req.body;
 
@@ -52,7 +52,7 @@ const getItems = (req, res) => {
       console.error(err);
       res.status(DEFAULT_ERROR).send({ message: "Error from updateItem", err });
     });
-};*/
+}; */
 
 const likeItem = (req, res) => {
   const { itemId } = req.params;
@@ -62,7 +62,7 @@ const likeItem = (req, res) => {
     return res.status(BAD_REQUEST_ERROR).send({ message: "Invalid item ID" });
   }
 
-  ClothingItem.findByIdAndUpdate(
+  return ClothingItem.findByIdAndUpdate(
     itemId,
     { $addToSet: { likes: userId } },
     { new: true }
@@ -90,7 +90,7 @@ const dislikeItem = (req, res) => {
     return res.status(BAD_REQUEST_ERROR).send({ message: "Invalid item ID" });
   }
 
-  ClothingItem.findByIdAndUpdate(
+  return ClothingItem.findByIdAndUpdate(
     itemId,
     { $pull: { likes: userId } },
     { new: true }
@@ -119,7 +119,7 @@ const deleteItem = (req, res) => {
     return res.status(BAD_REQUEST_ERROR).send({ message: "Invalid item ID" });
   }
 
-  ClothingItem.findByIdAndDelete(itemId)
+  return ClothingItem.findByIdAndDelete(itemId)
     .orFail()
     .then((item) => {
       res.status(200).send({ data: item });
