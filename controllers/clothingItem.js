@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const ClothingItem = require("../models/clothingItem");
 const {
   BAD_REQUEST_ERROR,
@@ -19,7 +20,7 @@ const createItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res.status(VALIDATION_ERROR).send({ message: err.message });
+        return res.status(BAD_REQUEST_ERROR).send({ message: err.message });
       }
       return res.status(DEFAULT_ERROR).send({ message: err.message });
     });
@@ -37,11 +38,11 @@ const getItems = (req, res) => {
 };
 
 const updateItem = (req, res) => {
-  const { itemId } = req.params;
-  const { name, weather, imageURL } = req.body;
+  const { id } = req.params;
+  const { name, weather, imageUrl } = req.body;
 
-  ClothingItem.findByIdAndUpdate(itemId, {
-    $set: { name, weather, imageURL },
+  ClothingItem.findByIdAndUpdate(id, {
+    $set: { name, weather, imageUrl },
   })
     .orFail()
     .then((item) => {
@@ -54,11 +55,15 @@ const updateItem = (req, res) => {
 };
 
 const likeItem = (req, res) => {
-  const { id } = req.params;
-  const { userId } = req.user._id;
+  const { itemId } = req.params;
+  const userId = req.user._id;
+
+  if (!mongoose.Types.ObjectId.isValid(itemId)) {
+    return res.status(BAD_REQUEST_ERROR).send({ message: "Invalid item ID" });
+  }
 
   ClothingItem.findByIdAndUpdate(
-    id,
+    itemId,
     { $addToSet: { likes: userId } },
     { new: true }
   )
@@ -80,7 +85,11 @@ const likeItem = (req, res) => {
 
 const dislikeItem = (req, res) => {
   const { itemId } = req.params;
-  const { userId } = req.user._id;
+  const userId = req.user._id;
+
+  if (!mongoose.Types.ObjectId.isValid(itemId)) {
+    return res.status(BAD_REQUEST_ERROR).send({ message: "Invalid item ID" });
+  }
 
   ClothingItem.findByIdAndUpdate(
     itemId,
@@ -108,6 +117,10 @@ const dislikeItem = (req, res) => {
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
+  if (!mongoose.Types.ObjectId.isValid(itemId)) {
+    return res.status(BAD_REQUEST_ERROR).send({ message: "Invalid item ID" });
+  }
+
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
     .then((item) => {
@@ -116,15 +129,15 @@ const deleteItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       console.error(err.name);
-      if (err.name === "CastError") {
-        return res.status(VALIDATION_ERROR).send({ message: err.message });
+      if (err.name === "CastError" || err.name === "ValidationError") {
+        return res.status(BAD_REQUEST_ERROR).send({ message: err.message });
+      } else if (err.name === "DocumentNotFoundError") {
+        return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
+      } else {
+        return res
+          .status(DEFAULT_ERROR)
+          .send({ message: "Error from deleteItem", err });
       }
-      if (err.name === "ValidationError") {
-        return res.status(VALIDATION_ERROR).send({ message: err.message });
-      }
-      return res
-        .status(DEFAULT_ERROR)
-        .send({ message: "Error from deleteItem", err });
     });
 };
 
