@@ -1,6 +1,6 @@
 const User = require("../models/user");
 const {
-  VALIDATION_ERROR,
+  BAD_REQUEST_ERROR,
   DEFAULT_ERROR,
   NOT_FOUND_ERROR,
 } = require("../utils/errors");
@@ -21,7 +21,7 @@ const createUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res.status(VALIDATION_ERROR).send({ message: err.message });
+        return res.status(BAD_REQUEST_ERROR).send({ message: err.message });
       }
       return res.status(DEFAULT_ERROR).send({ message: err.message });
     });
@@ -38,7 +38,7 @@ const getUser = (req, res) => {
         return res.status(NOT_FOUND_ERROR).send({ message: err.message });
       } else if (err.name === "CastError") {
         return res
-          .status(VALIDATION_ERROR)
+          .status(BAD_REQUEST_ERROR)
           .send({ message: "Invalid user ID format" });
       }
       return res.status(DEFAULT_ERROR).send({ message: err.message });
