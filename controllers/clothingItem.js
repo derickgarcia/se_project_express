@@ -37,7 +37,7 @@ const getItems = (req, res) => {
     });
 };
 
-const updateItem = (req, res) => {
+/*const updateItem = (req, res) => {
   const { id } = req.params;
   const { name, weather, imageUrl } = req.body;
 
@@ -52,7 +52,7 @@ const updateItem = (req, res) => {
       console.error(err);
       res.status(DEFAULT_ERROR).send({ message: "Error from updateItem", err });
     });
-};
+};*/
 
 const likeItem = (req, res) => {
   const { itemId } = req.params;
@@ -77,9 +77,8 @@ const likeItem = (req, res) => {
         return res.status(BAD_REQUEST_ERROR).send({ message: err.message });
       } else if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
-      } else {
-        res.status(DEFAULT_ERROR).send({ message: "Error from likeItem" });
       }
+      return res.status(DEFAULT_ERROR).send({ message: "Error from likeItem" });
     });
 };
 
@@ -106,11 +105,10 @@ const dislikeItem = (req, res) => {
         return res.status(BAD_REQUEST_ERROR).send({ message: err.message });
       } else if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
-      } else {
-        return res
-          .status(DEFAULT_ERROR)
-          .send({ message: "Error from dislikeItem", err });
       }
+      return res
+        .status(DEFAULT_ERROR)
+        .send({ message: "Error from dislikeItem", err });
     });
 };
 
@@ -133,18 +131,17 @@ const deleteItem = (req, res) => {
         return res.status(BAD_REQUEST_ERROR).send({ message: err.message });
       } else if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
-      } else {
-        return res
-          .status(DEFAULT_ERROR)
-          .send({ message: "Error from deleteItem", err });
       }
+      return res
+        .status(DEFAULT_ERROR)
+        .send({ message: "Error from deleteItem", err });
     });
 };
 
 module.exports = {
   createItem,
   getItems,
-  updateItem,
+  //updateItem,
   deleteItem,
   likeItem,
   dislikeItem,
