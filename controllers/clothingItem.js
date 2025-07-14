@@ -141,7 +141,7 @@ const deleteItem = (req, res) => {
 module.exports = {
   createItem,
   getItems,
-  //updateItem,
+  // updateItem,
   deleteItem,
   likeItem,
   dislikeItem,
