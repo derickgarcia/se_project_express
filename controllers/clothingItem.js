@@ -26,16 +26,17 @@ const createItem = (req, res) => {
     });
 };
 
-const getItems = (req, res) => {
-  return ClothingItem.find({})
+const getItems = (req, res) =>
+  ClothingItem.find({})
     .then((items) => {
       res.status(200).send(items);
     })
     .catch((err) => {
       console.error(err);
-      res.status(DEFAULT_ERROR).send({ message: "Error from getItems", err });
+      return res
+        .status(DEFAULT_ERROR)
+        .send({ message: "Error from getItems", err });
     });
-};
 
 /* const updateItem = (req, res) => {
   const { id } = req.params;
@@ -75,7 +76,8 @@ const likeItem = (req, res) => {
       console.error(err);
       if (err.name === "CastError") {
         return res.status(BAD_REQUEST_ERROR).send({ message: err.message });
-      } else if (err.name === "DocumentNotFoundError") {
+      }
+      if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
       }
       return res.status(DEFAULT_ERROR).send({ message: "Error from likeItem" });
