@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 const mainRouter = require("./routes/index");
+const { createUser, login } = require("./controllers/users");
 
 const app = express();
 
@@ -16,16 +18,14 @@ mongoose
 app.use(express.json());
 const routes = require("./routes");
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: "686061c955af5f8975fa1009",
-  };
-  next();
-});
-
 app.use(routes);
 
+app.use(cors());
+
 app.use("/", mainRouter);
+
+app.post("/signin", login);
+app.post("/signup", createUser);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

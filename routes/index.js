@@ -4,7 +4,9 @@ const userRouter = require("./users");
 
 const clothingItem = require("./clothingItem");
 
-router.use("/users", userRouter);
+const auth = require("../middlewares/auth");
+
+router.use("/users", auth, userRouter);
 
 router.use("/items", clothingItem);
 

@@ -4,6 +4,7 @@ const {
   BAD_REQUEST_ERROR,
   DEFAULT_ERROR,
   NOT_FOUND_ERROR,
+  FORBIDDEN_ERROR,
 } = require("../utils/errors");
 
 const createItem = (req, res) => {
@@ -122,8 +123,19 @@ const deleteItem = (req, res) => {
     return res.status(BAD_REQUEST_ERROR).send({ message: "Invalid item ID" });
   }
 
-  return ClothingItem.findByIdAndDelete(itemId)
-    .orFail()
+  ClothingItem.findById(itemId)
+    .then((item) => {
+      if (!item) {
+        return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
+      }
+
+      if (item.owner.toString() !== req.user._id.toString()) {
+        return res
+          .status(FORBIDDEN_ERROR)
+          .send({ message: "You do not have permission to delete this item" });
+      }
+      return ClothingItem.findByIdAndDelete(itemId);
+    })
     .then((item) => {
       res.status(200).send({ data: item });
     })
