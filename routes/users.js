@@ -8,8 +8,7 @@ const {
 // Middleware for authentication
 const auth = require("../middlewares/auth");
 
-router.get("/", getUsers);
-router.get("/users/me", auth, getCurrentUser);
-router.post("/", createUser);
+router.get("/me", auth, getCurrentUser);
+// router.get("/", getUsers);
 
 module.exports = router;

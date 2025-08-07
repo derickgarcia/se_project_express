@@ -15,17 +15,17 @@ mongoose
   })
   .catch(console.error);
 
-app.use(express.json());
-const routes = require("./routes");
-
-app.use(routes);
-
 app.use(cors());
-
-app.use("/", mainRouter);
+app.use(express.json());
 
 app.post("/signin", login);
 app.post("/signup", createUser);
+
+const routes = require("./routes");
+
+// app.use(routes);
+
+app.use("/", mainRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

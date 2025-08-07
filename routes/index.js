@@ -6,9 +6,11 @@ const clothingItem = require("./clothingItem");
 
 const auth = require("../middlewares/auth");
 
-router.use("/users", auth, userRouter);
-
 router.use("/items", clothingItem);
+
+router.use(auth);
+
+router.use("/users", userRouter);
 
 router.use((req, res) => {
   res.status(404).send({ message: "Not Found" });
