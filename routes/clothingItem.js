@@ -11,7 +11,7 @@ const {
 
 const auth = require("../middlewares/auth");
 // Apply authentication middleware
-router.post("/", createItem);
+router.post("/", auth, createItem);
 
 router.get("/", getItems);
 
