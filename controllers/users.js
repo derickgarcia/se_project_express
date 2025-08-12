@@ -134,10 +134,10 @@ const getCurrentUser = (req, res) => {
 
 const updateProfile = (req, res) => {
   const { name, avatar } = req.body;
-  const { userId } = req.user;
+  const { _id } = req.user;
 
   User.findByIdAndUpdate(
-    userId,
+    { _id },
     { name, avatar },
     { new: true, runValidators: true }
   )
@@ -165,4 +165,5 @@ module.exports = {
   createUser,
   getCurrentUser,
   login,
+  updateProfile,
 };

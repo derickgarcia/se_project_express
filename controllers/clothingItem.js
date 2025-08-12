@@ -117,6 +117,8 @@ const dislikeItem = (req, res) => {
 };
 
 const deleteItem = (req, res) => {
+  console.log("=== DELETE ITEM CONTROLLER ===");
+  console.log("req.user:", req.user);
   const { itemId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(itemId)) {
@@ -129,15 +131,14 @@ const deleteItem = (req, res) => {
         return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
       }
 
-      if (item.owner.toString() !== req.user._id.toString()) {
+      if (!item.owner || item.owner.toString() !== req.user._id.toString()) {
         return res
           .status(FORBIDDEN_ERROR)
           .send({ message: "You do not have permission to delete this item" });
       }
-      return ClothingItem.findByIdAndDelete(itemId);
-    })
-    .then((item) => {
-      res.status(200).send({ data: item });
+      return ClothingItem.findByIdAndDelete(itemId).then((item) => {
+        res.status(200).send({ data: item });
+      });
     })
     .catch((err) => {
       console.error(err);
