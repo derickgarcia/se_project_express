@@ -8,9 +8,6 @@ const {
 } = require("../utils/errors");
 
 const createItem = (req, res) => {
-  console.log(req);
-  console.log(req.body);
-
   const { name, weather, imageUrl } = req.body;
 
   return ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
@@ -21,9 +18,11 @@ const createItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res.status(BAD_REQUEST_ERROR).send({ message: err.message });
+        return res.status(BAD_REQUEST_ERROR).send({ message: "Invalid data" });
       }
-      return res.status(DEFAULT_ERROR).send({ message: err.message });
+      return res
+        .status(DEFAULT_ERROR)
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -34,9 +33,7 @@ const getItems = (req, res) =>
     })
     .catch((err) => {
       console.error(err);
-      return res
-        .status(DEFAULT_ERROR)
-        .send({ message: "Error from getItems", err });
+      return res.status(DEFAULT_ERROR).send({ message: "Error from getItems" });
     });
 
 /* const updateItem = (req, res) => {
@@ -76,7 +73,7 @@ const likeItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "CastError") {
-        return res.status(BAD_REQUEST_ERROR).send({ message: err.message });
+        return res.status(BAD_REQUEST_ERROR).send({ message: "Invalid item" });
       }
       if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
@@ -105,27 +102,25 @@ const dislikeItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "CastError") {
-        return res.status(BAD_REQUEST_ERROR).send({ message: err.message });
+        return res.status(BAD_REQUEST_ERROR).send({ message: "Invalid item" });
       }
       if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
       }
       return res
         .status(DEFAULT_ERROR)
-        .send({ message: "Error from dislikeItem", err });
+        .send({ message: "Error from dislikeItem" });
     });
 };
 
 const deleteItem = (req, res) => {
-  console.log("=== DELETE ITEM CONTROLLER ===");
-  console.log("req.user:", req.user);
   const { itemId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(itemId)) {
     return res.status(BAD_REQUEST_ERROR).send({ message: "Invalid item ID" });
   }
 
-  ClothingItem.findById(itemId)
+  return ClothingItem.findById(itemId)
     .then((item) => {
       if (!item) {
         return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
@@ -136,7 +131,7 @@ const deleteItem = (req, res) => {
           .status(FORBIDDEN_ERROR)
           .send({ message: "You do not have permission to delete this item" });
       }
-      return ClothingItem.findByIdAndDelete(itemId).then((item) => {
+      return ClothingItem.findByIdAndDelete(itemId).then(() => {
         res.status(200).send({ data: item });
       });
     })
@@ -144,7 +139,7 @@ const deleteItem = (req, res) => {
       console.error(err);
       console.error(err.name);
       if (err.name === "CastError" || err.name === "ValidationError") {
-        return res.status(BAD_REQUEST_ERROR).send({ message: err.message });
+        return res.status(BAD_REQUEST_ERROR).send({ message: "Invalid data" });
       }
       if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
